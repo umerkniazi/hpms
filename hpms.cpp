@@ -6,7 +6,7 @@
     Instructor : Mr. Muhammad Usman Yousaf
 
     Description:
-        Console-based system to manage patient records: registration, 
+        Console-based system to manage patient records: registration,
         search, update, delete, listing, and categorization.
 */
 
@@ -304,13 +304,20 @@ void showCategories()
     for (int i = 0; i < patientCount; i++)
     {
         string category;
-        if (symptoms[i] == "Fever") category = "Infection";
-        else if (symptoms[i] == "Cough" || symptoms[i] == "Shortness of Breath") category = "Respiratory";
-        else if (symptoms[i] == "Headache" || symptoms[i] == "Dizziness") category = "Neurological";
-        else if (symptoms[i] == "Fatigue") category = "General";
-        else if (symptoms[i] == "Chest Pain") category = "Cardiac";
-        else if (symptoms[i] == "Nausea" || symptoms[i] == "Vomiting") category = "Digestive";
-        else category = "Other";
+        if (symptoms[i] == "Fever")
+            category = "Infection";
+        else if (symptoms[i] == "Cough" || symptoms[i] == "Shortness of Breath")
+            category = "Respiratory";
+        else if (symptoms[i] == "Headache" || symptoms[i] == "Dizziness")
+            category = "Neurological";
+        else if (symptoms[i] == "Fatigue")
+            category = "General";
+        else if (symptoms[i] == "Chest Pain")
+            category = "Cardiac";
+        else if (symptoms[i] == "Nausea" || symptoms[i] == "Vomiting")
+            category = "Digestive";
+        else
+            category = "Other";
 
         cout << left << setw(20) << cnics[i]
              << setw(20) << names[i]
@@ -423,16 +430,26 @@ string selectSymptom()
 
     switch (choice)
     {
-    case 1: return "Fever";
-    case 2: return "Cough";
-    case 3: return "Headache";
-    case 4: return "Fatigue";
-    case 5: return "Shortness of Breath";
-    case 6: return "Chest Pain";
-    case 7: return "Dizziness";
-    case 8: return "Nausea";
-    case 9: return "Vomiting";
-    default: return "Other";
+    case 1:
+        return "Fever";
+    case 2:
+        return "Cough";
+    case 3:
+        return "Headache";
+    case 4:
+        return "Fatigue";
+    case 5:
+        return "Shortness of Breath";
+    case 6:
+        return "Chest Pain";
+    case 7:
+        return "Dizziness";
+    case 8:
+        return "Nausea";
+    case 9:
+        return "Vomiting";
+    default:
+        return "Other";
     }
 }
 
@@ -443,12 +460,24 @@ void setColor(int color)
 #else
     switch (color)
     {
-    case 7: cout << "\033[0m"; break;
-    case 10: cout << "\033[32m"; break;
-    case 11: cout << "\033[36m"; break;
-    case 12: cout << "\033[31m"; break;
-    case 14: cout << "\033[33m"; break;
-    default: cout << "\033[0m"; break;
+    case 7:
+        cout << "\033[0m";
+        break;
+    case 10:
+        cout << "\033[32m";
+        break;
+    case 11:
+        cout << "\033[36m";
+        break;
+    case 12:
+        cout << "\033[31m";
+        break;
+    case 14:
+        cout << "\033[33m";
+        break;
+    default:
+        cout << "\033[0m";
+        break;
     }
 #endif
 }

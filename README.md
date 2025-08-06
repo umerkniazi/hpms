@@ -1,67 +1,72 @@
 # Hospital Patient Management System (HPMS)
 
-## 📚 Course Information
+Console-based hospital patient management system built with C++ for a Programming Fundamentals course.
 
-- **Course:** Programming Fundamentals  
-- **Course Code:** AI-133  
-- **Semester:** Spring 2025  
+## 📚 Course Info
+
+- **Course:** Programming Fundamentals
+- **Code:** AI-133
+- **Semester:** Spring 2025
 - **Instructor:** Mr. Muhammad Usman Yousaf
 
-## 👥 Project Background
+## 👥 Background
 
-This project started as a group assignment during my first semester. Original contributors included:
+Originally a group assignment in my first semester with:
 
-- Amna  
-- Haider  
-- Rehman  
+- Amna
+- Haider
+- Rehman
 - Umer
 
-Since then, I've made significant changes and continued development independently.
+I've continued developing and improving the project on my own since the initial submission.
 
-## 🏥 Project Description
+## 🏥 Overview
 
-**HPMS** is a console-based Hospital Patient Management System written in **C++**. It allows you to register, search, update, delete, and categorize patient records. Data is stored in a plain text file for persistence between sessions.
+**HPMS** is a simple console program that lets you:
 
-This project is cross-platform and runs on **Windows**, **Linux**, and **macOS**, using only standard console features (no GUI or external libraries).
+- Register, search, update and delete patients
+- Filter by symptom
+- View all records
+- Save data to `patients.txt` for later use
+
+It’s completely terminal-based with no external libraries or GUI.
 
 ## 💡 Features
 
-- Register new patients  
-- Search by CNIC  
-- Update existing records  
-- Delete patients  
-- Categorize by symptom  
-- List all patients  
-- Save/load from `patients.txt`
+- Add new patients
+- Search by CNIC
+- Update records
+- Delete entries
+- List patients by symptom or all
+- Persistent file storage with `patients.txt`
 
-## 🖥 Cross-Platform Support
+## 🖥 Platform Support
 
-- Works in terminals like CMD, Bash, etc.
-- Uses:
-  - ANSI escape codes for Linux/macOS
-  - `windows.h` for Windows console colors
+- **Cross-platform:** Works on Windows, Linux, macOS
+- Uses ANSI escape codes for Linux/macOS
+- Uses `windows.h` for colors in Windows CMD
 
-## 🚀 How to Compile and Run
+## ⚙️ Compile & Run
 
-```
-# Linux/macOS
+```bash
+# On Linux/macOS
 g++ hpms.cpp -o hpms
 ./hpms
 
-# Windows
+# On Windows
 c++ hpms.cpp -o hpms.exe
 hpms.exe
 ```
 
-📌 Make sure `patients.txt` is in the same folder as your executable for data loading and saving.
+📌 Keep `patients.txt` in the same folder for saving and loading data.
 
-## 🔧 Future Improvements
+## 🛠 Improvements Planned
 
-- Refactor to use classes and proper object-oriented design  
-- Add input validation and error handling  
-- Improve the user interface (better formatting, colors, etc.)  
-- Add login/user roles (e.g. admin, doctor)  
-- Migrate from text file to a proper database
+- Convert to proper OOP with classes
+- Input validation and error handling
+- Better formatting and CLI styling
+- Add login system and user roles
+- Migrate from text file to database
 
 ## 📄 License
 
