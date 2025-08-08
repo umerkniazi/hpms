@@ -25,6 +25,7 @@
 
 using namespace std;
 
+// ===================== GLOBAL CONSTANTS & VARIABLES =====================
 const int MAX_PATIENTS = 100;
 int patientCount = 0;
 
@@ -37,7 +38,7 @@ string phoneNumbers[MAX_PATIENTS];
 string emailAddresses[MAX_PATIENTS];
 string symptoms[MAX_PATIENTS];
 
-// Function declarations
+// ===================== FUNCTION DECLARATIONS =====================
 void printMenu();
 void registerPatient();
 void searchPatientByCNIC();
@@ -53,6 +54,7 @@ void waitForKey();
 void savePatientsToFile();
 void loadPatientsFromFile();
 
+// ===================== MAIN PROGRAM FLOW =====================
 int main()
 {
     loadPatientsFromFile();
@@ -72,29 +74,16 @@ int main()
             continue;
         }
 
-        if (choice == 7)
-            break;
+        if (choice == 7) break;
 
         switch (choice)
         {
-        case 1:
-            registerPatient();
-            break;
-        case 2:
-            searchPatientByCNIC();
-            break;
-        case 3:
-            updatePatient();
-            break;
-        case 4:
-            showCategories();
-            break;
-        case 5:
-            listAllPatients();
-            break;
-        case 6:
-            deletePatientByCNIC();
-            break;
+        case 1: registerPatient(); break;
+        case 2: searchPatientByCNIC(); break;
+        case 3: updatePatient(); break;
+        case 4: showCategories(); break;
+        case 5: listAllPatients(); break;
+        case 6: deletePatientByCNIC(); break;
         default:
             setColor(12);
             cout << "Invalid choice. Try again.\n";
@@ -102,7 +91,6 @@ int main()
             break;
         }
 
-        cout << "\nPress any key to continue...";
         waitForKey();
     }
 
@@ -114,6 +102,7 @@ int main()
     return 0;
 }
 
+// ===================== MENU FUNCTIONS =====================
 void printMenu()
 {
     clearScreen();
@@ -150,6 +139,7 @@ void printMenu()
     resetColor();
 }
 
+// ===================== PATIENT MANAGEMENT =====================
 void registerPatient()
 {
     if (patientCount >= MAX_PATIENTS)
@@ -304,20 +294,13 @@ void showCategories()
     for (int i = 0; i < patientCount; i++)
     {
         string category;
-        if (symptoms[i] == "Fever")
-            category = "Infection";
-        else if (symptoms[i] == "Cough" || symptoms[i] == "Shortness of Breath")
-            category = "Respiratory";
-        else if (symptoms[i] == "Headache" || symptoms[i] == "Dizziness")
-            category = "Neurological";
-        else if (symptoms[i] == "Fatigue")
-            category = "General";
-        else if (symptoms[i] == "Chest Pain")
-            category = "Cardiac";
-        else if (symptoms[i] == "Nausea" || symptoms[i] == "Vomiting")
-            category = "Digestive";
-        else
-            category = "Other";
+        if (symptoms[i] == "Fever") category = "Infection";
+        else if (symptoms[i] == "Cough" || symptoms[i] == "Shortness of Breath") category = "Respiratory";
+        else if (symptoms[i] == "Headache" || symptoms[i] == "Dizziness") category = "Neurological";
+        else if (symptoms[i] == "Fatigue") category = "General";
+        else if (symptoms[i] == "Chest Pain") category = "Cardiac";
+        else if (symptoms[i] == "Nausea" || symptoms[i] == "Vomiting") category = "Digestive";
+        else category = "Other";
 
         cout << left << setw(20) << cnics[i]
              << setw(20) << names[i]
@@ -401,6 +384,7 @@ void deletePatientByCNIC()
     }
 }
 
+// ===================== SYMPTOM SELECTION =====================
 string selectSymptom()
 {
     int choice;
@@ -418,8 +402,7 @@ string selectSymptom()
         cout << "Enter choice (1-10): ";
         cin >> choice;
 
-        if (!cin.fail() && choice >= 1 && choice <= 10)
-            break;
+        if (!cin.fail() && choice >= 1 && choice <= 10) break;
 
         cin.clear();
         cin.ignore(1000, '\n');
@@ -430,29 +413,20 @@ string selectSymptom()
 
     switch (choice)
     {
-    case 1:
-        return "Fever";
-    case 2:
-        return "Cough";
-    case 3:
-        return "Headache";
-    case 4:
-        return "Fatigue";
-    case 5:
-        return "Shortness of Breath";
-    case 6:
-        return "Chest Pain";
-    case 7:
-        return "Dizziness";
-    case 8:
-        return "Nausea";
-    case 9:
-        return "Vomiting";
-    default:
-        return "Other";
+    case 1: return "Fever";
+    case 2: return "Cough";
+    case 3: return "Headache";
+    case 4: return "Fatigue";
+    case 5: return "Shortness of Breath";
+    case 6: return "Chest Pain";
+    case 7: return "Dizziness";
+    case 8: return "Nausea";
+    case 9: return "Vomiting";
+    default: return "Other";
     }
 }
 
+// ===================== UTILITY FUNCTIONS =====================
 void setColor(int color)
 {
 #ifdef _WIN32
@@ -460,32 +434,17 @@ void setColor(int color)
 #else
     switch (color)
     {
-    case 7:
-        cout << "\033[0m";
-        break;
-    case 10:
-        cout << "\033[32m";
-        break;
-    case 11:
-        cout << "\033[36m";
-        break;
-    case 12:
-        cout << "\033[31m";
-        break;
-    case 14:
-        cout << "\033[33m";
-        break;
-    default:
-        cout << "\033[0m";
-        break;
+    case 7: cout << "\033[0m"; break;
+    case 10: cout << "\033[32m"; break;
+    case 11: cout << "\033[36m"; break;
+    case 12: cout << "\033[31m"; break;
+    case 14: cout << "\033[33m"; break;
+    default: cout << "\033[0m"; break;
     }
 #endif
 }
 
-void resetColor()
-{
-    setColor(7);
-}
+void resetColor() { setColor(7); }
 
 void clearScreen()
 {
@@ -506,6 +465,7 @@ void waitForKey()
 #endif
 }
 
+// ===================== DATA PERSISTENCE =====================
 void savePatientsToFile()
 {
     ofstream outFile("patients.txt");
