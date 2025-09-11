@@ -15,6 +15,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <algorithm>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -25,11 +26,9 @@
 
 using namespace std;
 
-// ===================== GLOBAL CONSTANTS & VARIABLES =====================
 const int MAX_PATIENTS = 100;
 int patientCount = 0;
 
-// Patient data arrays
 string cnics[MAX_PATIENTS];
 string names[MAX_PATIENTS];
 int ages[MAX_PATIENTS];
@@ -38,7 +37,6 @@ string phoneNumbers[MAX_PATIENTS];
 string emailAddresses[MAX_PATIENTS];
 string symptoms[MAX_PATIENTS];
 
-// ===================== FUNCTION DECLARATIONS =====================
 void printMenu();
 void registerPatient();
 void searchPatientByCNIC();
@@ -54,9 +52,40 @@ void waitForKey();
 void savePatientsToFile();
 void loadPatientsFromFile();
 
-// ===================== MAIN PROGRAM FLOW =====================
+// Validate CNIC format: 12345-1234567-1
+bool isValidCNIC(const string &cnic)
+{
+    return cnic.length() == 15 &&
+           isdigit(cnic[0]) && isdigit(cnic[1]) && isdigit(cnic[2]) && isdigit(cnic[3]) && isdigit(cnic[4]) &&
+           cnic[5] == '-' &&
+           isdigit(cnic[6]) && isdigit(cnic[7]) && isdigit(cnic[8]) && isdigit(cnic[9]) && isdigit(cnic[10]) &&
+           isdigit(cnic[11]) && isdigit(cnic[12]) &&
+           cnic[13] == '-' &&
+           isdigit(cnic[14]);
+}
+
+// Validate phone number format: 03001234567
+bool isValidPhone(const string &phone)
+{
+    return phone.length() == 11 && phone.substr(0, 2) == "03" &&
+           all_of(phone.begin(), phone.end(), ::isdigit);
+}
+
+// Simple email validation: must contain '@' and '.' after '@'
+bool isValidEmail(const string &email)
+{
+    size_t at = email.find('@');
+    size_t dot = email.find('.', at + 1);
+    return !email.empty() && at != string::npos && dot != string::npos && dot > at + 1;
+}
+
 int main()
 {
+    setColor(11);
+    cout << "\n=============================================\n";
+    cout << " Welcome to the Hospital Patient Management System\n";
+    cout << "=============================================\n";
+    resetColor();
     loadPatientsFromFile();
     int choice = 0;
 
@@ -68,25 +97,38 @@ int main()
             cin.clear();
             cin.ignore(1000, '\n');
             setColor(12);
-            cout << "Invalid input. Please enter a number between 1 and 7.\n";
+            cout << "\n[!] Invalid input. Please enter a number between 1 and 7.\n";
             resetColor();
             waitForKey();
             continue;
         }
 
-        if (choice == 7) break;
+        if (choice == 7)
+            break;
 
         switch (choice)
         {
-        case 1: registerPatient(); break;
-        case 2: searchPatientByCNIC(); break;
-        case 3: updatePatient(); break;
-        case 4: showCategories(); break;
-        case 5: listAllPatients(); break;
-        case 6: deletePatientByCNIC(); break;
+        case 1:
+            registerPatient();
+            break;
+        case 2:
+            searchPatientByCNIC();
+            break;
+        case 3:
+            updatePatient();
+            break;
+        case 4:
+            showCategories();
+            break;
+        case 5:
+            listAllPatients();
+            break;
+        case 6:
+            deletePatientByCNIC();
+            break;
         default:
             setColor(12);
-            cout << "Invalid choice. Try again.\n";
+            cout << "\n[!] Invalid choice. Please select a valid option from the menu.\n";
             resetColor();
             break;
         }
@@ -102,7 +144,6 @@ int main()
     return 0;
 }
 
-// ===================== MENU FUNCTIONS =====================
 void printMenu()
 {
     clearScreen();
@@ -135,24 +176,53 @@ void printMenu()
     setColor(10);
     cout << "\n  Total Patients Registered: " << patientCount << "\n";
     setColor(11);
-    cout << "\n  Select an option and press Enter [1-7]: ";
+    cout << "\n  Please select an option and press Enter [1-7]: ";
     resetColor();
 }
 
-// ===================== PATIENT MANAGEMENT =====================
 void registerPatient()
 {
     if (patientCount >= MAX_PATIENTS)
     {
         setColor(12);
-        cout << "Maximum number of patients reached.\n";
+        cout << "\n[!] Maximum number of patients reached. Cannot register more.\n";
         resetColor();
         return;
     }
 
     cin.ignore();
-    cout << "Enter CNIC (e.g., 12345-1234567-1): ";
-    getline(cin, cnics[patientCount]);
+    string cnicInput;
+    while (true)
+    {
+        cout << "\nEnter CNIC (format: 12345-1234567-1): ";
+        getline(cin, cnicInput);
+        bool duplicate = false;
+        for (int i = 0; i < patientCount; i++)
+        {
+            if (cnics[i] == cnicInput)
+            {
+                duplicate = true;
+                break;
+            }
+        }
+        if (!isValidCNIC(cnicInput))
+        {
+            setColor(12);
+            cout << "[!] Invalid CNIC format. Please use 12345-1234567-1.\n";
+            resetColor();
+        }
+        else if (duplicate)
+        {
+            setColor(12);
+            cout << "[!] This CNIC is already registered. Please enter a unique CNIC.\n";
+            resetColor();
+        }
+        else
+        {
+            cnics[patientCount] = cnicInput;
+            break;
+        }
+    }
 
     cout << "Enter full name: ";
     getline(cin, names[patientCount]);
@@ -166,7 +236,7 @@ void registerPatient()
         cin.clear();
         cin.ignore(1000, '\n');
         setColor(12);
-        cout << "Invalid age. Try again.\n";
+        cout << "[!] Invalid age. Please enter a number between 1 and 120.\n";
         resetColor();
     }
 
@@ -178,22 +248,52 @@ void registerPatient()
         if (genders[patientCount] == 'M' || genders[patientCount] == 'F')
             break;
         setColor(12);
-        cout << "Invalid input. Use 'M' or 'F'.\n";
+        cout << "[!] Invalid input. Please enter 'M' for Male or 'F' for Female.\n";
         resetColor();
     }
 
     cin.ignore();
-    cout << "Enter phone number (e.g., 03001234567): ";
-    getline(cin, phoneNumbers[patientCount]);
+    string phoneInput;
+    while (true)
+    {
+        cout << "Enter phone number (format: 03001234567): ";
+        getline(cin, phoneInput);
+        if (!isValidPhone(phoneInput))
+        {
+            setColor(12);
+            cout << "[!] Invalid phone number format. Please use 03001234567.\n";
+            resetColor();
+        }
+        else
+        {
+            phoneNumbers[patientCount] = phoneInput;
+            break;
+        }
+    }
 
-    cout << "Enter email address: ";
-    getline(cin, emailAddresses[patientCount]);
+    string emailInput;
+    while (true)
+    {
+        cout << "Enter email address: ";
+        getline(cin, emailInput);
+        if (!isValidEmail(emailInput))
+        {
+            setColor(12);
+            cout << "[!] Invalid email address. Please enter a valid email (e.g., user@example.com).\n";
+            resetColor();
+        }
+        else
+        {
+            emailAddresses[patientCount] = emailInput;
+            break;
+        }
+    }
 
     symptoms[patientCount] = selectSymptom();
     patientCount++;
     savePatientsToFile();
     setColor(10);
-    cout << "Patient registered successfully.\n";
+    cout << "\n[OK] Patient registered successfully!\n";
     resetColor();
 }
 
@@ -201,7 +301,7 @@ void searchPatientByCNIC()
 {
     string cnic;
     cin.ignore();
-    cout << "Enter the patient's CNIC: ";
+    cout << "\nEnter the patient's CNIC to search (format: 12345-1234567-1): ";
     getline(cin, cnic);
     bool found = false;
 
@@ -231,7 +331,7 @@ void searchPatientByCNIC()
     if (!found)
     {
         setColor(12);
-        cout << "Patient not found.\n";
+        cout << "\n[!] Patient not found. Please check the CNIC and try again.\n";
         resetColor();
     }
 }
@@ -240,39 +340,79 @@ void updatePatient()
 {
     string cnic;
     cin.ignore();
-    cout << "Enter CNIC to update: ";
+    cout << "\nEnter CNIC to update (format: 12345-1234567-1): ";
     getline(cin, cnic);
 
     for (int i = 0; i < patientCount; i++)
     {
         if (cnics[i] == cnic)
         {
-            cout << "Current Age: " << ages[i] << "\n";
-            cout << "Enter new age: ";
-            cin >> ages[i];
+            while (true)
+            {
+                cout << "Current Age: " << ages[i] << "\n";
+                cout << "Enter new age: ";
+                cin >> ages[i];
+                if (!cin.fail() && ages[i] >= 1 && ages[i] <= 120)
+                    break;
+                cin.clear();
+                cin.ignore(1000, '\n');
+                setColor(12);
+                cout << "[!] Invalid age. Please enter a number between 1 and 120.\n";
+                resetColor();
+            }
             cin.ignore();
 
-            cout << "Current Phone: " << phoneNumbers[i] << "\n";
-            cout << "Enter new phone: ";
-            getline(cin, phoneNumbers[i]);
+            string phoneInput;
+            while (true)
+            {
+                cout << "Current Phone: " << phoneNumbers[i] << "\n";
+                cout << "Enter new phone (format: 03001234567): ";
+                getline(cin, phoneInput);
+                if (!isValidPhone(phoneInput))
+                {
+                    setColor(12);
+                    cout << "[!] Invalid phone number format. Please use 03001234567.\n";
+                    resetColor();
+                }
+                else
+                {
+                    phoneNumbers[i] = phoneInput;
+                    break;
+                }
+            }
 
             cout << "Current Email: " << emailAddresses[i] << "\n";
-            cout << "Enter new email: ";
-            getline(cin, emailAddresses[i]);
+            string emailInput;
+            while (true)
+            {
+                cout << "Enter new email: ";
+                getline(cin, emailInput);
+                if (!isValidEmail(emailInput))
+                {
+                    setColor(12);
+                    cout << "[!] Invalid email address. Please enter a valid email (e.g., user@example.com).\n";
+                    resetColor();
+                }
+                else
+                {
+                    emailAddresses[i] = emailInput;
+                    break;
+                }
+            }
 
             cout << "Current Symptom: " << symptoms[i] << "\n";
             symptoms[i] = selectSymptom();
 
             savePatientsToFile();
             setColor(10);
-            cout << "Patient updated successfully.\n";
+            cout << "\n[OK] Patient updated successfully!\n";
             resetColor();
             return;
         }
     }
 
     setColor(12);
-    cout << "Patient not found.\n";
+    cout << "\n[!] Patient not found. Please check the CNIC and try again.\n";
     resetColor();
 }
 
@@ -281,12 +421,13 @@ void showCategories()
     if (patientCount == 0)
     {
         setColor(12);
-        cout << "No patients registered.\n";
+        cout << "\n[!] No patients registered yet.\n";
         resetColor();
         return;
     }
 
     setColor(11);
+    cout << "\nPatient Categories:\n";
     cout << left << setw(20) << "CNIC" << setw(20) << "Name"
          << setw(20) << "Symptom" << setw(20) << "Category" << endl;
     cout << string(80, '-') << endl;
@@ -294,13 +435,20 @@ void showCategories()
     for (int i = 0; i < patientCount; i++)
     {
         string category;
-        if (symptoms[i] == "Fever") category = "Infection";
-        else if (symptoms[i] == "Cough" || symptoms[i] == "Shortness of Breath") category = "Respiratory";
-        else if (symptoms[i] == "Headache" || symptoms[i] == "Dizziness") category = "Neurological";
-        else if (symptoms[i] == "Fatigue") category = "General";
-        else if (symptoms[i] == "Chest Pain") category = "Cardiac";
-        else if (symptoms[i] == "Nausea" || symptoms[i] == "Vomiting") category = "Digestive";
-        else category = "Other";
+        if (symptoms[i] == "Fever")
+            category = "Infection";
+        else if (symptoms[i] == "Cough" || symptoms[i] == "Shortness of Breath")
+            category = "Respiratory";
+        else if (symptoms[i] == "Headache" || symptoms[i] == "Dizziness")
+            category = "Neurological";
+        else if (symptoms[i] == "Fatigue")
+            category = "General";
+        else if (symptoms[i] == "Chest Pain")
+            category = "Cardiac";
+        else if (symptoms[i] == "Nausea" || symptoms[i] == "Vomiting")
+            category = "Digestive";
+        else
+            category = "Other";
 
         cout << left << setw(20) << cnics[i]
              << setw(20) << names[i]
@@ -317,12 +465,13 @@ void listAllPatients()
     if (patientCount == 0)
     {
         setColor(12);
-        cout << "No patients registered.\n";
+        cout << "\n[!] No patients registered yet.\n";
         resetColor();
         return;
     }
 
     setColor(11);
+    cout << "\nAll Registered Patients:\n";
     cout << left << setw(18) << "CNIC" << setw(20) << "Name"
          << setw(6) << "Age" << setw(8) << "Gender"
          << setw(15) << "Phone" << setw(30) << "Email"
@@ -348,7 +497,7 @@ void deletePatientByCNIC()
 {
     string cnicToDelete;
     cin.ignore();
-    cout << "Enter CNIC of the patient to delete: ";
+    cout << "\nEnter CNIC of the patient to delete (format: 12345-1234567-1): ";
     getline(cin, cnicToDelete);
     bool found = false;
 
@@ -356,6 +505,18 @@ void deletePatientByCNIC()
     {
         if (cnics[i] == cnicToDelete)
         {
+            cout << "\nAre you sure you want to delete this patient? (Y/N): ";
+            char confirm;
+            cin >> confirm;
+            confirm = toupper(confirm);
+            cin.ignore();
+            if (confirm != 'Y')
+            {
+                setColor(14);
+                cout << "\n[!] Deletion cancelled.\n";
+                resetColor();
+                return;
+            }
             for (int j = i; j < patientCount - 1; j++)
             {
                 cnics[j] = cnics[j + 1];
@@ -369,7 +530,7 @@ void deletePatientByCNIC()
             patientCount--;
             savePatientsToFile();
             setColor(10);
-            cout << "Patient deleted successfully.\n";
+            cout << "\n[OK] Patient deleted successfully!\n";
             resetColor();
             found = true;
             break;
@@ -379,18 +540,17 @@ void deletePatientByCNIC()
     if (!found)
     {
         setColor(12);
-        cout << "No patient found with that CNIC.\n";
+        cout << "\n[!] No patient found with that CNIC. Please check and try again.\n";
         resetColor();
     }
 }
 
-// ===================== SYMPTOM SELECTION =====================
 string selectSymptom()
 {
     int choice;
     while (true)
     {
-        cout << "+---------------------------+\n";
+        cout << "\n+---------------------------+\n";
         cout << "|   Select a Symptom        |\n";
         cout << "+---------------------------+\n";
         cout << "| 1. Fever       2. Cough   |\n";
@@ -402,31 +562,42 @@ string selectSymptom()
         cout << "Enter choice (1-10): ";
         cin >> choice;
 
-        if (!cin.fail() && choice >= 1 && choice <= 10) break;
+        if (!cin.fail() && choice >= 1 && choice <= 10)
+            break;
 
         cin.clear();
         cin.ignore(1000, '\n');
         setColor(12);
-        cout << "Invalid input. Try again.\n";
+        cout << "[!] Invalid input. Please enter a number between 1 and 10.\n";
         resetColor();
     }
+    cin.ignore();
 
     switch (choice)
     {
-    case 1: return "Fever";
-    case 2: return "Cough";
-    case 3: return "Headache";
-    case 4: return "Fatigue";
-    case 5: return "Shortness of Breath";
-    case 6: return "Chest Pain";
-    case 7: return "Dizziness";
-    case 8: return "Nausea";
-    case 9: return "Vomiting";
-    default: return "Other";
+    case 1:
+        return "Fever";
+    case 2:
+        return "Cough";
+    case 3:
+        return "Headache";
+    case 4:
+        return "Fatigue";
+    case 5:
+        return "Shortness of Breath";
+    case 6:
+        return "Chest Pain";
+    case 7:
+        return "Dizziness";
+    case 8:
+        return "Nausea";
+    case 9:
+        return "Vomiting";
+    default:
+        return "Other";
     }
 }
 
-// ===================== UTILITY FUNCTIONS =====================
 void setColor(int color)
 {
 #ifdef _WIN32
@@ -434,12 +605,24 @@ void setColor(int color)
 #else
     switch (color)
     {
-    case 7: cout << "\033[0m"; break;
-    case 10: cout << "\033[32m"; break;
-    case 11: cout << "\033[36m"; break;
-    case 12: cout << "\033[31m"; break;
-    case 14: cout << "\033[33m"; break;
-    default: cout << "\033[0m"; break;
+    case 7:
+        cout << "\033[0m";
+        break;
+    case 10:
+        cout << "\033[32m";
+        break;
+    case 11:
+        cout << "\033[36m";
+        break;
+    case 12:
+        cout << "\033[31m";
+        break;
+    case 14:
+        cout << "\033[33m";
+        break;
+    default:
+        cout << "\033[0m";
+        break;
     }
 #endif
 }
@@ -465,7 +648,6 @@ void waitForKey()
 #endif
 }
 
-// ===================== DATA PERSISTENCE =====================
 void savePatientsToFile()
 {
     ofstream outFile("patients.txt");
@@ -483,6 +665,7 @@ void savePatientsToFile()
                 << genders[i] << ',' << phoneNumbers[i] << ','
                 << emailAddresses[i] << ',' << symptoms[i] << '\n';
     }
+    outFile.close();
 }
 
 void loadPatientsFromFile()
@@ -508,4 +691,5 @@ void loadPatientsFromFile()
 
         patientCount++;
     }
+    file.close();
 }
